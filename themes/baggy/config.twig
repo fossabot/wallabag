@@ -121,7 +121,7 @@
             <p><a href="?import">{% trans "You can click here to fetch content for articles with no content." %}</a></p>
             
             <h2>{% trans "Export your wallabag data" %}</h2>
-            {% if constant('STORAGE') == 'sqlite' %}
+            {% if constant('STORAGE') == 'sqlite' and is_admin %}
             <p><a href="?download" target="_blank">{% trans "Click here" %}</a> {% trans "to download your database." %}</p>{% endif %}
             <p><a href="?export" target="_blank">{% trans "Click here" %}</a> {% trans "to export your wallabag data." %}</p>
             
@@ -132,36 +132,72 @@
             <h2>{% trans "Cache" %}</h2>
             <p><a href="?empty-cache">{% trans "Click here" %}</a> {% trans "to delete cache." %}</p>
 
-            <h2>{% trans 'Add user' %}</h2>
-            <p>{% trans 'Add a new user :' %}</p>
-            <form method="post" action="?newuser">
+            {% if is_admin %}
+            <!-- admin-only stuff -->
+            <h1 id='admin' >{% trans 'Admin Stuff (show)' %}</h1>
+            <div id='admin-panel' >
+            <script type="text/javascript">
+                $(document).ready(function() {
+                $("#admin-panel").hide();
+                function closeAdmin(){
+                    $("#admin-panel").toggle();
+                }
+                $("#admin").click(function(){
+                closeAdmin();
+                });
+                });
+            </script>
+                <h2>{% trans 'List of users' %}</h2>
+                <table style="text-align:center;" cellpadding="0" cellspacing="0" border="0" width="100%" id="chart">
+                <thead>
+                    <tr>
+                        <th>{% trans "Username" %}</th>
+                        <th>{% trans "Id" %}</th>
+                        <th>{% trans "Email" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                <tr><td>{{ user.username }}</td>
+                <td>{{ user.id }}</td>
+                <td>{{ user.email }}</td></tr>
+                {% endfor %}
+                </tbody>
+                </table>
+
+                <h2>{% trans 'Add user' %}</h2>
+                <p>{% trans 'Add a new user :' %}</p>
+                <form method="post" action="?newuser">
+                    <fieldset class="w500p">
+                    <div class="row">
+                        <label class="col w150p" for="newusername">{% trans 'Login for new user' %}</label>
+                        <input class="col" type="text" id="newusername" name="newusername" placeholder="{% trans 'Login' %}">
+                    </div>
+                    <div class="row">
+                        <label class="col w150p" for="password4newuser">{% trans "Password for new user" %}</label>
+                        <input class="col" type="password" id="password4newuser" name="password4newuser" placeholder="{% trans "Password" %}">
+                    </div>
+                    <div class="row mts txtcenter">
+                        <button type="submit">{% trans "Send" %}</button>	
+                    </div>
+                    </fieldset>
+                </form>
+                
+                <h2>{% trans "Delete account" %}</h2>
+                {% if not only_user %}<form method="post" action="?deluser">
+                <p>{% trans "You can delete your account by entering your password and validating." %}<br /><b>{% trans "Be careful, data will be erased forever (that is a very long time)." %}</b></p>
                 <fieldset class="w500p">
-                <div class="row">
-                    <label class="col w150p" for="newusername">{% trans 'Login for new user' %}</label>
-                    <input class="col" type="text" id="newusername" name="newusername" placeholder="{% trans 'Login' %}">
-                </div>
-                <div class="row">
-                    <label class="col w150p" for="password4newuser">{% trans "Password for new user" %}</label>
-                    <input class="col" type="password" id="password4newuser" name="password4newuser" placeholder="{% trans "Password" %}">
-                </div>
+                    <div class="row">
+                        <label class="col w150p" for="password4deletinguser">{% trans "Type here your password" %}</label>
+                        <input class="col" type="password" id="password4deletinguser" name="password4deletinguser" placeholder="{% trans "Password" %}">
+                    </div>
                 <div class="row mts txtcenter">
-                    <button type="submit">{% trans "Send" %}</button>	
+                    <button type="submit">{% trans "Send" %}</button>
                 </div>
                 </fieldset>
-            </form>
-            
-            <h2>{% trans "Delete account" %}</h2>
-            {% if not only_user %}<form method="post" action="?deluser">
-            <p>{% trans "You can delete your account by entering your password and validating." %}<br /><b>{% trans "Be careful, data will be erased forever (that is a very long time)." %}</b></p>
-            <fieldset class="w500p">
-                <div class="row">
-                    <label class="col w150p" for="password4deletinguser">{% trans "Type here your password" %}</label>
-                    <input class="col" type="password" id="password4deletinguser" name="password4deletinguser" placeholder="{% trans "Password" %}">
-                </div>
-            <div class="row mts txtcenter">
-                <button type="submit">{% trans "Send" %}</button>
+                </form>
+                {% else %}<p>{% trans "You are the only user, you cannot delete your own account." %}<br />
+                {% trans "To completely remove wallabag, delete the wallabag folder on your web server." %}</p>{% endif %}
             </div>
-            </form>
-            {% else %}<p>{% trans "You are the only user, you cannot delete your own account." %}<br />
-            {% trans "To completely remove wallabag, delete the wallabag folder on your web server." %}</p>{% endif %}
+            {% endif %}
 {% endblock %}

@@ -235,6 +235,14 @@ class Database {
         list($count) = $query->fetch();
         return $count;
     }
+
+    public function getUsers($userID = NULL)
+    {
+        $sql = 'SELECT * FROM users'.( $userID ? ' WHERE id=?' : '');
+        $query = $this->executeQuery($sql, ( $userID ? array($userID) : array()));
+        $users = $query->fetchAll();
+        return $users;
+    }
     
     public function getUserPassword($userID)
     {

@@ -327,6 +327,8 @@ class Poche
                 $token = $this->user->getConfigValue('token');
                 $http_auth = (isset($_SERVER['PHP_AUTH_USER']) || isset($_SERVER['REMOTE_USER'])) ? true : false;
                 $only_user = ($this->store->listUsers() > 1) ? false : true;
+                $is_admin = false; # $this->store->isAdmin($this->user->getId()) will be used when available.
+                $users = $this->store->getUsers(); //should be done only if is_admin, else return false
                 $tpl_vars = array(
                     'themes' => $themes,
                     'languages' => $languages,
@@ -339,7 +341,9 @@ class Poche
                     'token' => $token,
                     'user_id' => $this->user->getId(),
                     'http_auth' => $http_auth,
-                    'only_user' => $only_user
+                    'only_user' => $only_user,
+                    'users' => $users,
+                    'is_admin' => $is_admin
                 );
                 Tools::logm('config view');
                 break;
